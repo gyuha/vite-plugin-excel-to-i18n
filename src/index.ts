@@ -1,7 +1,7 @@
 import { Plugin } from 'vite';
 import * as fs from 'fs';
 import * as path from 'path';
-import * as XLSX from 'xlsx';
+import XLSX from 'xlsx';
 import * as chokidar from 'chokidar';
 
 export interface ExcelToI18nOptions {
@@ -50,7 +50,12 @@ export interface ExcelToI18nOptions {
   useNestedKeys?: boolean;
 }
 
-function excelToI18n(options: ExcelToI18nOptions): Plugin {
+/**
+ * Excel 파일을 i18n JSON 파일로 변환하는 Vite 플러그인
+ * @param options 플러그인 옵션
+ * @returns Vite 플러그인
+ */
+export function excelToI18n(options: ExcelToI18nOptions): Plugin {
   const {
     excelPath,
     outputDir,
@@ -196,5 +201,4 @@ function excelToI18n(options: ExcelToI18nOptions): Plugin {
 }
 
 // CommonJS와 ESM 모두 지원하기 위한 내보내기 방식
-export default excelToI18n;
-export { excelToI18n }; 
+export default excelToI18n; 
