@@ -1,0 +1,13 @@
+node_modules
+src
+example
+.gitignore
+tsconfig.json
+.DS_Store
+*.log
+.idea
+.vscode
+coverage
+.env
+.env.*
+!.env.example 
