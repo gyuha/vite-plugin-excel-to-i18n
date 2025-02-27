@@ -15,12 +15,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/yourusername/vite-plugin-excel-to-i18n.git"
+    "url": "git+https://github.com/gyuha/vite-plugin-excel-to-i18n.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/vite-plugin-excel-to-i18n/issues"
+    "url": "https://github.com/gyuha/vite-plugin-excel-to-i18n/issues"
   },
-  "homepage": "https://github.com/yourusername/vite-plugin-excel-to-i18n#readme",
+  "homepage": "https://github.com/gyuha/vite-plugin-excel-to-i18n#readme",
   "keywords": [
     "vite-plugin",
     "i18n",
@@ -28,7 +28,7 @@
     "internationalization",
     "localization"
   ],
-  "author": "",
+  "author": "Gyuha <nicegyuha@gmail.com>",
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^22.13.5",

@@ -1,7 +1,7 @@
 import { Plugin } from 'vite';
 import * as fs from 'fs';
 import * as path from 'path';
-import * as XLSX from 'xlsx';
+import XLSX from 'xlsx';
 
 export interface ExcelToI18nOptions {
   /**
@@ -13,10 +13,10 @@ export interface ExcelToI18nOptions {
    */
   outputDir: string;
   /**
-   * 언어 코드가 있는 열 인덱스 (0부터 시작)
+   * 카테고리가 있는 열 인덱스 (0부터 시작)
    * 기본값: 0
    */
-  langColumnIndex?: number;
+  categoryColumnIndex?: number;
   /**
    * 키가 있는 열 인덱스 (0부터 시작)
    * 기본값: 1
@@ -42,18 +42,24 @@ export interface ExcelToI18nOptions {
    * 기본값: 1
    */
   dataStartRowIndex?: number;
+  /**
+   * 중첩된 키를 사용할지 여부 (카테고리/키 형식)
+   * 기본값: false
+   */
+  useNestedKeys?: boolean;
 }
 
 export default function excelToI18n(options: ExcelToI18nOptions): Plugin {
   const {
     excelPath,
     outputDir,
-    langColumnIndex = 0,
+    categoryColumnIndex = 0,
     keyColumnIndex = 1,
     valueStartColumnIndex = 2,
     sheetName,
     headerRowIndex = 0,
-    dataStartRowIndex = 1
+    dataStartRowIndex = 1,
+    useNestedKeys = false
   } = options;
 
   return {
@@ -77,7 +83,7 @@ export default function excelToI18n(options: ExcelToI18nOptions): Plugin {
         const languages = headers.slice(valueStartColumnIndex);
         
         // 각 언어별 번역 데이터 객체 초기화
-        const translations: Record<string, Record<string, string>> = {};
+        const translations: Record<string, Record<string, any>> = {};
         languages.forEach((lang, index) => {
           translations[lang] = {};
         });
@@ -87,6 +93,7 @@ export default function excelToI18n(options: ExcelToI18nOptions): Plugin {
           const row = jsonData[i] as any[];
           if (!row || row.length === 0) continue;
           
+          const category = row[categoryColumnIndex];
           const key = row[keyColumnIndex];
           if (!key) continue;
           
@@ -94,7 +101,17 @@ export default function excelToI18n(options: ExcelToI18nOptions): Plugin {
           languages.forEach((lang, langIndex) => {
             const value = row[valueStartColumnIndex + langIndex];
             if (value !== undefined && value !== null) {
-              translations[lang][key] = String(value);
+              if (useNestedKeys && category) {
+                // 중첩된 키 사용 (카테고리/키 형식)
+                if (!translations[lang][category]) {
+                  translations[lang][category] = {};
+                }
+                translations[lang][category][key] = String(value);
+              } else {
+                // 카테고리와 키를 결합한 형식 (category/key)
+                const fullKey = category ? `${category}/${key}` : key;
+                translations[lang][fullKey] = String(value);
+              }
             }
           });
         }
