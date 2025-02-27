@@ -50,7 +50,7 @@ export interface ExcelToI18nOptions {
   useNestedKeys?: boolean;
 }
 
-export default function excelToI18n(options: ExcelToI18nOptions): Plugin {
+function excelToI18n(options: ExcelToI18nOptions): Plugin {
   const {
     excelPath,
     outputDir,
@@ -193,4 +193,8 @@ export default function excelToI18n(options: ExcelToI18nOptions): Plugin {
       }
     }
   };
-} 
+}
+
+// CommonJS와 ESM 모두 지원하기 위한 내보내기 방식
+export default excelToI18n;
+export { excelToI18n }; 
