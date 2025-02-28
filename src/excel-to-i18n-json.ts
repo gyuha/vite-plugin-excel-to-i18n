@@ -43,14 +43,14 @@ export default function excelToI18nJson(config: ExcelToI18nOptions) {
 
     readXlsxFile(path.join(_dirname, config.excelPath), { schema }).then(({ rows, errors }) => {
         if (errors.length > 0) {
-            logger.error(`Excel 파일 읽기 오류: ${errors.join(', ')}`, { timestamp: true });
+            logger.error(`Excel file reading error: ${errors.join(', ')}`, { timestamp: true });
             return;
         }
         try {
             rows.forEach((row: any) => {
-                // category가 undefined인 경우 빈 문자열로 처리
+                // Handle undefined category as empty array
                 const categoryPath = row['category'] ? row['category'].split('/') : [];
-                // key가 없으면 처리하지 않음
+                // Skip processing if key is missing
                 if (!row['key']) {
                     return;
                 }
@@ -62,7 +62,7 @@ export default function excelToI18nJson(config: ExcelToI18nOptions) {
                 });
             });
 
-            // 출력 디렉토리가 없으면 생성
+            // Create output directory if it doesn't exist
             const outputDir = path.join(_dirname, config.outputDir);
             if (!fs.existsSync(outputDir)) {
                 fs.mkdirSync(outputDir, { recursive: true });
@@ -70,11 +70,11 @@ export default function excelToI18nJson(config: ExcelToI18nOptions) {
 
             writeFile(config.outputDir, localize);
         } catch (error) {
-            console.error('엑셀 처리 중 오류 발생:', error);
+            console.error('Error occurred while processing Excel:', error);
             return;
         }
-        logger.info(`${config.excelPath} 파일이 성공적으로 변환되었습니다.`, { timestamp: true });
+        logger.info(`${config.excelPath} file has been successfully converted.`, { timestamp: true });
     }).catch(error => {
-        logger.error(`엑셀 파일 읽기 실패: ${error.message}`, { timestamp: true });
+        logger.error(`Failed to read Excel file: ${error.message}`, { timestamp: true });
     });
 }
