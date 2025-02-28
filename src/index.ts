@@ -64,8 +64,137 @@ export interface ExcelToI18nOptions {
   wasmModulePath?: string;
 }
 
+// 환경 감지
+const isBrowser = typeof window !== 'undefined';
+const isNode = typeof process !== 'undefined' && process.versions && process.versions.node;
+const isESM = typeof import.meta !== 'undefined';
+
 // WebAssembly 모듈이 초기화되었는지 여부
 let isWasmInitialized = false;
+
+// WebAssembly 관련 경로 설정
+const wasmModulePath = 'excel-to-i18n-wasm-wrapper.mjs';
+const wasmFallbackJsPath = 'excel-to-i18n-wasm_bg.js';
+
+// WebAssembly 모듈 경로 해결
+let wasmResolvedPath = '';
+let localEsmWrapperPath = '';
+
+if (isBrowser) {
+  try {
+    // Vite 또는 다른 번들러의 import.meta.url 사용
+    const baseUrl = import.meta.url || '';
+    wasmResolvedPath = new URL(wasmModulePath, baseUrl).href;
+  } catch (e) {
+    console.warn('WebAssembly 모듈 경로 해결 실패:', e);
+  }
+}
+
+if (isNode) {
+  try {
+    const path = require('path');
+    // Node.js에서 로컬 경로 설정
+    localEsmWrapperPath = path.resolve(__dirname, wasmModulePath);
+  } catch (e) {
+    console.warn('로컬 WebAssembly 경로 해결 실패:', e);
+  }
+}
+
+// 파일 시스템 및 경로 처리를 위한 유틸리티 함수
+// ESM과 CJS 모두 지원하기 위한 유틸리티
+async function getFileSystem() {
+  if (isBrowser) return null;
+  
+  if (isESM) {
+    try {
+      // ESM에서는 동적 import 사용
+      return await import('fs');
+    } catch (err) {
+      console.error('ESM에서 fs 모듈 로드 실패:', err);
+      
+      // 대안으로 node:fs 시도
+      try {
+        return await import('node:fs');
+      } catch (nodeErr) {
+        console.error('node:fs 모듈 로드 실패:', nodeErr);
+      }
+      
+      // 마지막 대안으로 전역 require 시도
+      if (typeof global !== 'undefined' && global.require) {
+        return global.require('fs');
+      }
+      
+      throw new Error('fs 모듈을 로드할 수 없습니다');
+    }
+  } else {
+    // CommonJS 환경
+    try {
+      // 안전한 require
+      const dynamicRequire = 
+        typeof require !== 'undefined' 
+          ? require 
+          : typeof global !== 'undefined' && global.require 
+            ? global.require 
+            : null;
+            
+      if (!dynamicRequire) {
+        throw new Error('require 함수를 찾을 수 없습니다');
+      }
+      
+      return dynamicRequire('fs');
+    } catch (err) {
+      console.error('CJS에서 fs 모듈 로드 실패:', err);
+      throw err;
+    }
+  }
+}
+
+async function getPath() {
+  if (isBrowser) return null;
+  
+  if (isESM) {
+    try {
+      // ESM에서는 동적 import 사용
+      return await import('path');
+    } catch (err) {
+      console.error('ESM에서 path 모듈 로드 실패:', err);
+      
+      // 대안으로 node:path 시도
+      try {
+        return await import('node:path');
+      } catch (nodeErr) {
+        console.error('node:path 모듈 로드 실패:', nodeErr);
+      }
+      
+      // 마지막 대안으로 전역 require 시도
+      if (typeof global !== 'undefined' && global.require) {
+        return global.require('path');
+      }
+      
+      throw new Error('path 모듈을 로드할 수 없습니다');
+    }
+  } else {
+    // CommonJS 환경
+    try {
+      // 안전한 require
+      const dynamicRequire = 
+        typeof require !== 'undefined' 
+          ? require 
+          : typeof global !== 'undefined' && global.require 
+            ? global.require 
+            : null;
+            
+      if (!dynamicRequire) {
+        throw new Error('require 함수를 찾을 수 없습니다');
+      }
+      
+      return dynamicRequire('path');
+    } catch (err) {
+      console.error('CJS에서 path 모듈 로드 실패:', err);
+      throw err;
+    }
+  }
+}
 
 /**
  * Excel 파일을 i18n JSON 파일로 변환하는 Vite 플러그인
@@ -116,6 +245,15 @@ export function excelToI18n(options: ExcelToI18nOptions): Plugin {
   // Excel 파일을 처리하고 i18n 파일을 생성하는 함수
   const processExcelFile = async () => {
     try {
+      // 파일시스템과 경로 모듈 불러오기
+      const fs = await getFileSystem();
+      const path = await getPath();
+      
+      if (!fs || !path) {
+        console.error('Error: Cannot access filesystem in this environment');
+        return;
+      }
+      
       // 파일이 존재하는지 확인
       if (!fs.existsSync(excelPath)) {
         console.error(`Excel file not found: ${excelPath}`);
@@ -153,11 +291,11 @@ export function excelToI18n(options: ExcelToI18nOptions): Plugin {
         } catch (wasmError) {
           console.warn('WebAssembly conversion error, falling back to JavaScript implementation:', wasmError);
           // 오류 발생 시 JavaScript 구현으로 대체
-          translations = processExcelFileJs();
+          translations = await processExcelFileJs(fs, path);
         }
       } else {
         // JavaScript 구현 사용
-        translations = processExcelFileJs();
+        translations = await processExcelFileJs(fs, path);
       }
       
       // 출력 디렉토리가 없으면 생성
@@ -179,7 +317,7 @@ export function excelToI18n(options: ExcelToI18nOptions): Plugin {
   };
   
   // JavaScript로 구현된 Excel 파일 처리 함수
-  const processExcelFileJs = (): Record<string, Record<string, any>> => {
+  const processExcelFileJs = async (fs: any, path: any): Promise<Record<string, Record<string, any>>> => {
     console.log('Using JavaScript for Excel to i18n conversion...');
     
     // Excel 파일 읽기
@@ -332,4 +470,99 @@ export function excelToI18n(options: ExcelToI18nOptions): Plugin {
 export { convertExcelToI18nWithWasm, initWasm, isWasmSupported };
 
 // CommonJS와 ESM 모두 지원하기 위한 내보내기 방식
-export default excelToI18n; 
+export default excelToI18n;
+
+// WebAssembly 모듈 불러오기
+async function loadWasmModule(): Promise<any> {
+  try {
+    // 1. 웹 브라우저 환경에서 ESM 로드
+    if (isBrowser) {
+      console.info('브라우저 환경에서 WebAssembly 로드 시도 중...');
+      if (wasmResolvedPath) {
+        try {
+          const wasmModule = await import(/* @vite-ignore */ wasmResolvedPath);
+          if (wasmModule && typeof wasmModule.initWasm === 'function') {
+            const initialized = await wasmModule.initWasm();
+            if (initialized) {
+              console.info('WebAssembly 모듈이 성공적으로 초기화되었습니다.');
+              return wasmModule;
+            }
+          }
+        } catch (error) {
+          console.warn('ESM WebAssembly 모듈 로드 실패:', error);
+        }
+      }
+    }
+
+    // 2. Node.js ESM 환경으로 로드 시도
+    if (isNode && typeof import.meta !== 'undefined') {
+      console.info('Node.js ESM 환경에서 WebAssembly 로드 시도 중...');
+      if (localEsmWrapperPath) {
+        try {
+          const wasmModule = await import(/* @vite-ignore */ localEsmWrapperPath);
+          if (wasmModule && typeof wasmModule.initWasm === 'function') {
+            const initialized = await wasmModule.initWasm();
+            if (initialized) {
+              console.info('Local ESM WebAssembly 모듈이 성공적으로 초기화되었습니다.');
+              return wasmModule;
+            }
+          }
+        } catch (error) {
+          console.warn('로컬 ESM WebAssembly 모듈 로드 실패:', error);
+        }
+      }
+    }
+
+    // 3. Node.js CommonJS 환경으로 로드 시도
+    if (isNode) {
+      console.info('Node.js CommonJS 환경에서 WebAssembly 로드 시도 중...');
+      try {
+        // Node.js에서 require 동적 호출을 위한 코드
+        const requireModule = (path: string) => {
+          return new Function('require', `return require('${path}')`)(require);
+        };
+
+        // CJS 래퍼 모듈 로드 시도
+        const localCjsWrapperPath = './excel-to-i18n-wasm-cjs.js';
+        const wasmModule = requireModule(localCjsWrapperPath);
+        
+        if (wasmModule && typeof wasmModule.initWasm === 'function') {
+          const initialized = wasmModule.initWasm();
+          if (initialized) {
+            console.info('CommonJS WebAssembly 모듈이 성공적으로 초기화되었습니다.');
+            return wasmModule;
+          }
+        }
+      } catch (error) {
+        console.warn('CommonJS WebAssembly 모듈 로드 실패:', error);
+      }
+    }
+
+    // 4. 원본 WASM 바인딩 직접 로드 시도
+    if (isNode) {
+      console.info('원본 WASM 바인딩 직접 로드 시도 중...');
+      try {
+        const requireModule = (path: string) => {
+          return new Function('require', `return require('${path}')`)(require);
+        };
+        
+        // 로컬 바인딩 모듈 직접 로드
+        const bindingsModule = requireModule('./excel-to-i18n-wasm_bg.js');
+        
+        if (bindingsModule && typeof bindingsModule.convert_excel_to_i18n === 'function') {
+          console.info('원본 WebAssembly 바인딩이 성공적으로 로드되었습니다.');
+          return bindingsModule;
+        }
+      } catch (error) {
+        console.warn('원본 WebAssembly 바인딩 로드 실패:', error);
+      }
+    }
+
+    // 5. JavaScript 폴백 구현 사용
+    console.warn('WebAssembly 모듈 로드에 실패했습니다. JavaScript 구현으로 대체합니다.');
+    return null;
+  } catch (error) {
+    console.error('WebAssembly 모듈 로드 중 예기치 않은 오류 발생:', error);
+    return null;
+  }
+} 
