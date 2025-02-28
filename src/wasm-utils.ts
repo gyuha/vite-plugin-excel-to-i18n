@@ -27,7 +27,10 @@ const isBrowser = typeof window !== 'undefined';
 const isNode = typeof process !== 'undefined' && 
                 typeof process.versions !== 'undefined' && 
                 typeof process.versions.node !== 'undefined';
-const isESM = typeof import.meta !== 'undefined';
+// ESM 감지 - import.meta 대신 다른 방법 사용
+const isESM = typeof process !== 'undefined' && 
+              typeof process.versions !== 'undefined' && 
+              typeof process.versions.module !== 'undefined';
 
 // 동적 불러오기 도우미 함수 (비동기)
 async function dynamicImport(path: string): Promise<any> {
@@ -73,14 +76,17 @@ async function initWasmFromBinary(wasmBinary: ArrayBuffer | Uint8Array): Promise
     }
     
     // 수동으로 WebAssembly 인스턴스 생성 및 초기화
-    wasmInstance = {
-      // 여기에 필요한 함수들을 추가해야 하지만, 
-      // 실제 구현에서는 convert_excel_to_i18n 등 필요한 내보내기 함수들을 수동으로 바인딩해야 함
-      // 이 예제에서는 일반적인 JavaScript 구현으로 폴백하도록 함
-    };
+    wasmInstance = instance.exports;
+    
+    // 필요한 함수 존재 여부 확인
+    if (typeof wasmInstance.convert_excel_to_i18n !== 'function' && 
+        typeof wasmInstance.process_excel !== 'function') {
+      console.error('WebAssembly 모듈에 필요한 함수가 없습니다');
+      return false;
+    }
     
     console.log('WebAssembly 바이너리에서 직접 초기화 성공');
-    return false; // JavaScript 구현으로 폴백하도록 false 반환
+    return true; // 성공적으로 초기화되었으므로 true 반환
   } catch (error) {
     console.error('WebAssembly 바이너리 초기화 오류:', error);
     return false;
@@ -105,7 +111,8 @@ export async function initWasm(wasmModulePath: string): Promise<boolean> {
       if (isBrowser) {
         try {
           // 브라우저 환경에서 WebAssembly 로드 시도
-          const wasmUrl = new URL('./excel-to-i18n-wasm_bg.wasm', import.meta.url);
+          // import.meta.url 대신 상대 경로 사용
+          const wasmUrl = './dist/wasm/excel_to_i18n_bg.wasm';
           const response = await fetch(wasmUrl);
           const wasmBinary = await response.arrayBuffer();
           
@@ -133,9 +140,10 @@ export async function initWasm(wasmModulePath: string): Promise<boolean> {
               
               // 다양한 경로에서 .wasm 파일 찾기
               const possiblePaths = [
-                new URL('../dist/excel-to-i18n-wasm_bg.wasm', import.meta.url).pathname,
-                path.resolve(process.cwd(), './dist/excel-to-i18n-wasm_bg.wasm'),
-                path.resolve(process.cwd(), './node_modules/vite-plugin-excel-to-i18n/dist/excel-to-i18n-wasm_bg.wasm')
+                // import.meta.url 대신 __dirname 사용 (ESM에서는 사용 불가능하지만 CommonJS 빌드를 위해 수정)
+                path.resolve(__dirname, '../dist/wasm/excel_to_i18n_bg.wasm'),
+                path.resolve(process.cwd(), './dist/wasm/excel_to_i18n_bg.wasm'),
+                path.resolve(process.cwd(), './node_modules/vite-plugin-excel-to-i18n/dist/wasm/excel_to_i18n_bg.wasm')
               ];
               
               let wasmBinary = null;
@@ -172,9 +180,9 @@ export async function initWasm(wasmModulePath: string): Promise<boolean> {
               
               // 다양한 경로에서 .wasm 파일 찾기
               const possiblePaths = [
-                path.resolve(__dirname, '../dist/excel-to-i18n-wasm_bg.wasm'),
-                path.resolve(process.cwd(), './dist/excel-to-i18n-wasm_bg.wasm'),
-                path.resolve(process.cwd(), './node_modules/vite-plugin-excel-to-i18n/dist/excel-to-i18n-wasm_bg.wasm')
+                path.resolve(__dirname, '../dist/wasm/excel_to_i18n_bg.wasm'),
+                path.resolve(process.cwd(), './dist/wasm/excel_to_i18n_bg.wasm'),
+                path.resolve(process.cwd(), './node_modules/vite-plugin-excel-to-i18n/dist/wasm/excel_to_i18n_bg.wasm')
               ];
               
               let wasmBinary = null;
@@ -250,27 +258,21 @@ export async function convertExcelToI18nWithWasm(
       use_nested_keys: options.useNestedKeys
     };
 
-    // Wasm 모듈의 convert_excel_to_i18n 함수 호출
-    if (typeof wasmInstance.convert_excel_to_i18n === 'function') {
-      const result = wasmInstance.convert_excel_to_i18n(wasmOptions);
-      
-      if (result && result.success) {
-        return result.translations;
-      } else {
-        console.error('WASM 변환 실패:', result?.error || '알 수 없는 오류');
-        return null;
-      }
+    // WebAssembly 함수 호출
+    if (wasmInstance.process_excel) {
+      const result = wasmInstance.process_excel(excelData, wasmOptions);
+      return result as Record<string, Record<string, string>>;
     } else {
-      console.error('WebAssembly 모듈에 convert_excel_to_i18n 함수가 없습니다');
+      console.warn('WebAssembly 모듈에 process_excel 함수가 없습니다');
       return null;
     }
   } catch (error) {
-    console.error('WASM 변환 중 오류:', error);
+    console.error('WebAssembly로 Excel 변환 중 오류:', error);
     return null;
   }
 }
 
-// WebAssembly가 지원되는지 확인
+// WebAssembly 지원 여부 확인
 export function isWasmSupported(): boolean {
   return (
     typeof WebAssembly === 'object' &&

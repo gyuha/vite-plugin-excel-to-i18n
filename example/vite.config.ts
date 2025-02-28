@@ -6,11 +6,24 @@ const excelToJsonOptions: ExcelToI18nOptions = {
   excelPath: 'language.xlsx',
   outputDir: 'src/i18n/locales',
   supportLanguages: ['ko', 'en', 'jp'],
+  useWasm: true
 };
 
 export default defineConfig({
   plugins: [
     react(),
     excelToI18n(excelToJsonOptions) as any
-  ]
+  ],
+  assetsInclude: ['**/*.wasm'],
+  server: {
+    fs: {
+      allow: ['..']
+    }
+  },
+  build: {
+    target: 'esnext',
+    rollupOptions: {
+      external: [],
+    }
+  }
 }); 
