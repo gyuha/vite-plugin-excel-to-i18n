@@ -1,0 +1,13 @@
+{
+  "common": {
+    "button": {
+      "reset": "Reset",
+      "next": "Next",
+      "pre": "Previous"
+    }
+  },
+  "title": "i18n Multilingual Examples",
+  "message": {
+    "greeting": "hello"
+  }
+}
