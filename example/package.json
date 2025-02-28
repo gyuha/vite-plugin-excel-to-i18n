@@ -8,14 +8,20 @@
     "build": "vite build",
     "preview": "vite preview"
   },
-  "keywords": ["i18n", "excel", "vite-plugin", "react"],
+  "keywords": [
+    "i18n",
+    "excel",
+    "vite-plugin",
+    "react"
+  ],
   "author": "",
   "license": "MIT",
   "dependencies": {
     "i18next": "^23.10.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-i18next": "^14.0.5"
+    "react-i18next": "^14.0.5",
+    "vite-plugin-excel-to-i18n": "file:.."
   },
   "devDependencies": {
     "@types/react": "^18.2.55",

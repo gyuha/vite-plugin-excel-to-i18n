@@ -10,4 +10,9 @@ tsconfig.json
 coverage
 .env
 .env.*
-!.env.example 
+!.env.example
+wasm/src
+wasm/target
+wasm/.gitignore
+# WebAssembly 컴파일된 파일은 포함
+!wasm/pkg 

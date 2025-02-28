@@ -10,8 +10,10 @@
     "outDir": "dist",
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "lib": ["ES2020", "DOM", "WebWorker"],
+    "typeRoots": ["./node_modules/@types", "./wasm/pkg"]
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "wasm/pkg/**/*.d.ts"],
   "exclude": ["node_modules", "dist"]
 } 
