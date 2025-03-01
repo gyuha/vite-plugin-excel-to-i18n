@@ -20,35 +20,11 @@ export interface ExcelToI18nOptions {
    * WebAssembly 사용 여부 (기본값: false)
    */
   useWasm?: boolean;
-  /**
-   * 카테고리 열 인덱스 (기본값: 0)
-   */
-  categoryColumnIndex?: number;
-  /**
-   * 키 열 인덱스 (기본값: 1)
-   */
-  keyColumnIndex?: number;
-  /**
-   * 값 시작 열 인덱스 (기본값: 2)
-   */
-  valueStartColumnIndex?: number;
-  /**
-   * 헤더 행 인덱스 (기본값: 0)
-   */
-  headerRowIndex?: number;
-  /**
-   * 데이터 시작 행 인덱스 (기본값: 1)
-   */
-  dataStartRowIndex?: number;
-  /**
-   * 중첩 키 사용 여부 (기본값: false)
-   */
-  useNestedKeys?: boolean;
 }
 
 export default function excelToI18n(config: ExcelToI18nOptions): Plugin {
   // WebAssembly 사용 여부 확인
-  const useWasm = config.useWasm === true;
+  let useWasm = config.useWasm === true;
   
   // 실제 변환 함수 선택 (WebAssembly 또는 JavaScript)
   const processExcel = async () => {
@@ -57,6 +33,7 @@ export default function excelToI18n(config: ExcelToI18nOptions): Plugin {
       const success = await excelToI18nJsonWasm(config);
       // WebAssembly 실패 시 JavaScript로 폴백
       if (!success) {
+        useWasm = false;
         console.warn('WebAssembly processing failed, falling back to JavaScript implementation');
         excelToI18nJson(config);
       }
