@@ -16,7 +16,6 @@ export interface ExcelToI18nOptions {
   supportLanguages: string[];
 }
 
- 
 
 export default function excelToI18n(config: ExcelToI18nOptions): Plugin {
   return {

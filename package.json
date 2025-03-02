@@ -11,6 +11,11 @@
       "import": "./dist/index.mjs",
       "require": "./dist/index.js",
       "default": "./dist/index.js"
+    },
+    "./wasm": {
+      "require": "./wasm/pkg/vite-plugin.js",
+      "import": "./wasm/pkg/vite-plugin.js",
+      "default": "./wasm/pkg/vite-plugin.js"
     }
   },
   "files": [
@@ -19,8 +24,11 @@
     "scripts"
   ],
   "scripts": {
-    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "build": "npm run build:js && npm run build:wasm",
+    "build:js": "tsup src/index.ts --format cjs,esm --dts",
+    "build:wasm": "node src/wasm/build.js",
     "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
+    "test:wasm": "node src/wasm/test.js",
     "prepublishOnly": "npm run build"
   },
   "repository": {

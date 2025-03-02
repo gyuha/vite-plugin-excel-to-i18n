@@ -8,6 +8,7 @@ A Vite plugin that converts Excel files to i18n JSON files. Makes translation ma
 - 📱 Real-time updates when Excel files change
 - 🔄 Supports nested key structures
 - 🌐 Supports multiple languages
+- ⚡ WebAssembly implementation for better performance
 
 ## Installation
 
@@ -34,9 +35,28 @@ The Excel file should be in the following format:
 
 ### vite.config.ts Configuration
 
+#### JavaScript Implementation (Default)
+
 ```typescript
 import { defineConfig } from 'vite';
 import excelToI18n from 'vite-plugin-excel-to-i18n';
+
+export default defineConfig({
+  plugins: [
+    excelToI18n({
+      excelPath: 'path/to/translations.xlsx', // Path to Excel file
+      outputDir: 'src/locales', // Output directory
+      supportLanguages: ['ko', 'en', 'jp'] // Supported languages
+    })
+  ]
+});
+```
+
+#### WebAssembly Implementation (Better Performance)
+
+```typescript
+import { defineConfig } from 'vite';
+import excelToI18n from 'vite-plugin-excel-to-i18n/wasm';
 
 export default defineConfig({
   plugins: [
@@ -101,6 +121,34 @@ The plugin generates JSON files for each language. It combines category and key 
     }
   }
 }
+```
+
+## WebAssembly Implementation
+
+This plugin provides a WebAssembly implementation for better performance, especially for large Excel files.
+
+### Requirements for WebAssembly
+
+- Node.js 14 or later
+- Rust (for building the WebAssembly module)
+- wasm-pack (for building the WebAssembly module)
+
+### Building the WebAssembly Module
+
+If you want to build the WebAssembly module yourself:
+
+```bash
+# Install wasm-pack if not already installed
+cargo install wasm-pack
+
+# Build the WebAssembly module
+npm run build:wasm
+```
+
+### Testing the WebAssembly Module
+
+```bash
+npm run test:wasm
 ```
 
 ## License
