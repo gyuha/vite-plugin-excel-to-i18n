@@ -1,0 +1,38 @@
+version: '3'
+
+tasks:
+  build-wasm:
+    desc: Build WebAssembly module with wasm-pack
+    dir: src/wasm
+    cmds:
+      - wasm-pack build --target nodejs --out-dir ../../pkg
+      - echo "WASM build completed. Run 'node test/node-debug.js' to test."
+    sources:
+      - src/**/*.rs
+      - Cargo.toml
+    generates:
+      - ../../pkg/**/*
+    method: checksum # Use checksum method to detect changes
+
+  create-test-file:
+    desc: Create test Excel file if it doesn't exist
+    cmds:
+      - node test/create-test-excel.js
+
+  ensure-example-dir:
+    desc: Create example directory if it doesn't exist
+    cmds:
+      - mkdir -p "../example" || echo "Example directory already exists"
+    platforms: [linux, darwin]
+      
+  ensure-example-dir:windows:
+    desc: Create example directory if it doesn't exist (Windows)
+    cmds:
+      - if not exist "..\example" mkdir "..\example"
+
+  wasm:test:
+    desc: Run tests for the wasm module
+    deps: [ensure-example-dir]
+    cmds:
+      - wasm-pack build src/wasm --target nodejs --out-dir pkg
+      - node test/node-debug.js

@@ -58,4 +58,21 @@ npx vite
 }
 ```
 
-`useNestedKeys: true` 옵션을 사용하면 중첩된 형식으로 JSON 파일이 생성됩니다. 
+`useNestedKeys: true` 옵션을 사용하면 중첩된 형식으로 JSON 파일이 생성됩니다.
+
+# Example Directory
+
+This directory contains example files for the vite-plugin-excel-to-i18n project.
+
+## language.xlsx
+
+A sample Excel file used for testing the WebAssembly module. The Excel file should have the following structure:
+
+| Category | Key | English | Korean | Japanese |
+|----------|-----|---------|--------|----------|
+| common   | hello | Hello | 안녕하세요 | こんにちは |
+| common   | goodbye | Goodbye | 안녕히 가세요 | さようなら |
+| menu     | file | File | 파일 | ファイル |
+| menu     | edit | Edit | 편집 | 編集 |
+
+The WebAssembly module will convert this Excel file into separate JSON files for each language.

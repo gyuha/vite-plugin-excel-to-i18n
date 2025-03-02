@@ -1,7 +1,7 @@
 {
   "name": "vite-plugin-excel-to-i18n",
   "version": "0.1.0",
-  "description": "Vite plugin to convert Excel files to i18n JSON using WebAssembly",
+  "description": "Excel to i18n converter plugin for Vite",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
@@ -18,14 +18,15 @@
     "src/wasm/pkg"
   ],
   "scripts": {
-    "build:wasm": "node src/wasm/build.js",
+    "build:wasm": "wasm-pack build src/wasm --target nodejs --out-dir pkg",
     "build:ts": "tsc -p tsconfig.json && tsc -p tsconfig-cjs.json",
     "clean:wasm": "node -e \"const fs=require('fs');const path=require('path');const dir=path.resolve('dist/wasm');if(fs.existsSync(dir)){fs.rmSync(dir,{recursive:true,force:true});}fs.mkdirSync(path.resolve('dist/wasm/pkg'),{recursive:true});\"",
     "build": "npm run clean:wasm && npm run build:wasm && npm run build:ts && npm run copy:wasm",
     "copy:wasm": "copyfiles -f \"src/wasm/pkg/*\" dist/wasm/pkg/",
     "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
     "prepublishOnly": "npm run build",
-    "pack:manual": "node scripts/pack.js"
+    "pack:manual": "node scripts/pack.js",
+    "test:wasm": "node test/node-debug.js"
   },
   "repository": {
     "type": "git",
@@ -53,7 +54,8 @@
     "read-excel-file": "^5.7.0",
     "tsup": "^8.4.0",
     "typescript": "^4.9.5",
-    "vite": "^4.0.0"
+    "vite": "^4.0.0",
+    "wasm-pack": "^0.11.0"
   },
   "peerDependencies": {
     "lodash-es": "^4.17.0",
