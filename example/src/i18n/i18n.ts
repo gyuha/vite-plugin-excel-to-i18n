@@ -4,7 +4,7 @@ import { initReactI18next } from 'react-i18next';
 // 자동 생성된 언어 파일 가져오기
 import ko from './locales/translation.ko.json';
 import en from './locales/translation.en.json';
-import jp from './locales/translation.jp.json';
+import ja from './locales/translation.ja.json';
 
 const resources = {
   ko: {
@@ -13,8 +13,8 @@ const resources = {
   en: {
     translation: en
   },
-  jp: {
-    translation: jp
+  ja: {
+    translation: ja
   }
 };
 

@@ -26,7 +26,7 @@ pnpm add vite-plugin-excel-to-i18n -D
 
 The Excel file should be in the following format:
 
-| category | key | ko | en | jp | ... |
+| category | key | ko | en | ja | ... |
 |----------|-----|----|----|----|----|
 | common/button | reset | 초기화 | Reset | リセット | ... |
 | common/button | next | 다음 | Next | 次へ | ... |
@@ -46,7 +46,7 @@ export default defineConfig({
     excelToI18n({
       excelPath: 'path/to/translations.xlsx', // Path to Excel file
       outputDir: 'src/locales', // Output directory
-      supportLanguages: ['ko', 'en', 'jp'] // Supported languages
+      supportLanguages: ['ko', 'en', 'ja'] // Supported languages
     })
   ]
 });
@@ -63,7 +63,7 @@ export default defineConfig({
     excelToI18n({
       excelPath: 'path/to/translations.xlsx', // Path to Excel file
       outputDir: 'src/locales', // Output directory
-      supportLanguages: ['ko', 'en', 'jp'] // Supported languages
+      supportLanguages: ['ko', 'en', 'ja'] // Supported languages
     })
   ]
 });
@@ -109,7 +109,7 @@ The plugin generates JSON files for each language. It combines category and key 
 }
 ```
 
-**translation.jp.json**
+**translation.ja.json**
 ```json
 {
   "common": {

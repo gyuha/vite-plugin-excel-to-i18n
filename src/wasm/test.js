@@ -115,4 +115,4 @@ try {
 // 사용 방법 출력
 console.log('\n📝 사용 방법:');
 console.log('  node test.js [엑셀파일경로] [출력디렉토리]');
-console.log('  예: node test.js ../example/language.xlsx ../example/locales'); 
+console.log('  예: node test.js ../../example/language.xlsx ../../example/src/i18n/locales'); 
