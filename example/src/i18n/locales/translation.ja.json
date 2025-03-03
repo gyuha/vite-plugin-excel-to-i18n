@@ -1,13 +1,13 @@
 {
   "common": {
     "button": {
-      "reset": "初期化",
       "next": "次へ",
-      "pre": "前のページ"
+      "pre": "前のページ",
+      "reset": "初期化"
     }
   },
-  "title": "i18n 多言語例",
   "message": {
     "greeting": "こんにちは"
-  }
+  },
+  "title": "i18n 多言語例"
 }

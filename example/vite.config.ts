@@ -6,6 +6,7 @@ const excelToJsonOptions: ExcelToI18nOptions = {
   excelPath: 'language.xlsx',
   outputDir: 'src/i18n/locales',
   supportLanguages: ['ko', 'en', 'ja'],
+  useWasm: true,
 };
 
 export default defineConfig({
