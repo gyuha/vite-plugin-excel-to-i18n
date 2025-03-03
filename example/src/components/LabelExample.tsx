@@ -5,7 +5,7 @@ function LabelExample() {
 
   return (
     <div className="label-example">
-      <label>{t('message/greeting')}</label>
+      <label>{t('message.greeting')}</label>
     </div>
   );
 }

@@ -1,13 +1,13 @@
 {
   "common": {
     "button": {
+      "reset": "초기화",
       "next": "다음",
-      "pre": "이전",
-      "reset": "초기화"
+      "pre": "이전"
     }
   },
+  "title": "i18n 다국어 예제",
   "message": {
     "greeting": "안녕하세요"
-  },
-  "title": "i18n 다국어 예제"
+  }
 }
