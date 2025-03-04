@@ -5,7 +5,7 @@ import excelToI18n, { ExcelToI18nOptions } from 'vite-plugin-excel-to-i18n';
 const excelToJsonOptions: ExcelToI18nOptions = {
   excelPath: 'language.xlsx',
   outputDir: 'src/i18n/locales',
-  supportLanguages: ['ko', 'en', 'jp'],
+  supportLanguages: ['ko', 'en', 'ja'],
 };
 
 export default defineConfig({
