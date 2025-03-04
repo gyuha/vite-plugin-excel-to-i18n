@@ -31,8 +31,8 @@ function App() {
             English
           </button>
           <button 
-            className={currentLang === 'jp' ? 'active' : ''} 
-            onClick={() => changeLanguage('jp')}
+            className={currentLang === 'ja' ? 'active' : ''} 
+            onClick={() => changeLanguage('ja')}
           >
             日本語
           </button>
