@@ -1,6 +1,6 @@
 {
   "name": "vite-plugin-excel-to-i18n",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "Vite plugin to convert Excel files to i18n JSON files",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
