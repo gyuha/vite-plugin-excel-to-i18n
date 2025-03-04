@@ -43,7 +43,7 @@ export default function excelToI18nJson(config: ExcelToI18nOptions) {
 
     readXlsxFile(path.join(_dirname, config.excelPath), { schema }).then(({ rows, errors }) => {
         if (errors.length > 0) {
-            logger.error(`Excel 파일 읽기 오류: ${errors.join(', ')}`, { timestamp: true });
+            logger.error(`Excel file reading error: ${errors.join(', ')}`, { timestamp: true });
             return;
         }
         try {
@@ -70,11 +70,11 @@ export default function excelToI18nJson(config: ExcelToI18nOptions) {
 
             writeFile(config.outputDir, localize);
         } catch (error) {
-            console.error('엑셀 처리 중 오류 발생:', error);
+            console.error('Error processing Excel file:', error);
             return;
         }
-        logger.info(`${config.excelPath} 파일이 성공적으로 변환되었습니다.`, { timestamp: true });
+        logger.info(`${config.excelPath} file has been successfully converted.`, { timestamp: true });
     }).catch(error => {
-        logger.error(`엑셀 파일 읽기 실패: ${error.message}`, { timestamp: true });
+        logger.error(`Failed to read Excel file: ${error.message}`, { timestamp: true });
     });
 }
