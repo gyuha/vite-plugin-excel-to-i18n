@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import { createLogger } from 'vite';
 import { ExcelToI18nOptions } from '.';
-const { process_excel_file } = require('./lib/excel_to_i18n_wasm');
+import { process_excel_file } from './lib/excel_to_i18n_wasm';
 
 const logger = createLogger('info', { prefix: '[language-wasm]' });
 

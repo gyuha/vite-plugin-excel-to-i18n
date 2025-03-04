@@ -19,10 +19,11 @@
     "scripts"
   ],
   "scripts": {
-    "build": "npm run build:js && npm run build:wasm",
-    "build:js": "npm run postbuild:wasm && tsup src/index.ts --format cjs,esm --dts --clean --sourcemap --treeshake --metafile --assets-include 'src/lib/**/*'",
-    "build:wasm": "node src/wasm/build.js",
-    "postbuild:wasm": "node --experimental-modules scripts/copy-wasm-to-lib.mjs",
+    "build": "npm-run-all build:wasm build:js",
+    "build:js": "tsup src/index.ts --format cjs,esm --dts --clean --sourcemap --treeshake --metafile",
+    "build:wasm": "npm-run-all build:wasm-compile build:wasm-copy",
+    "build:wasm-compile": "node src/wasm/build.js",
+    "build:wasm-copy": "node --experimental-modules scripts/copy-wasm-to-lib.js",
     "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
     "test:wasm": "node src/wasm/test.js",
     "prepublishOnly": "npm run build"
