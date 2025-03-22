@@ -4,8 +4,8 @@ A Vite plugin that converts Excel files to i18n JSON files. Makes translation ma
 
 ## Features
 
-- 🚀 Converts Excel files to i18n JSON files
-- 📱 Real-time updates when Excel files change
+- 🚀 Converts Excel and CSV files to i18n JSON files
+- 📱 Real-time updates when source files change
 - 🔄 Supports nested key structures (using '/' or '.' as separators)
 - 🌐 Supports multiple languages
 
@@ -34,6 +34,20 @@ The Excel file should be in the following format:
 
 Note: You can use either '/' or '.' as category separators (e.g., 'common/button' or 'common.button').
 
+### CSV File Format
+
+The CSV file should follow the same structure as Excel:
+
+```csv
+category,key,ko,en,ja
+common/button,reset,초기화,Reset,リセット
+common.button,next,다음,Next,次へ
+common/button,pre,이전,Previous,前へ
+common.button,button,버튼,Button,ボタン
+```
+
+Note: UTF-8 with BOM is fully supported to prevent character encoding issues.
+
 ### vite.config.ts Configuration
 
 ```typescript
@@ -43,7 +57,7 @@ import excelToI18n from 'vite-plugin-excel-to-i18n';
 export default defineConfig({
   plugins: [
     excelToI18n({
-      excelPath: 'src/i18n/language.csv',  // .csv 파일도 지원
+      excelPath: 'src/i18n/language.xlsx',  // .xlsx, .xls 또는 .csv 파일 지원
       outputDir: 'src/i18n/locales',
       supportLanguages: ['ko', 'en', 'ja']
     })
@@ -51,11 +65,16 @@ export default defineConfig({
 });
 ```
 
+## Supported File Types
+
+- Excel: `.xlsx`, `.xls`
+- CSV: `.csv`
+
 ## Options
 
 | Option | Type | Description |
 |------|------|------|
-| excelPath | string | Path to Excel file (required) |
+| excelPath | string | Path to Excel or CSV file (required) |
 | outputDir | string | Directory path where i18n JSON files will be saved (required) |
 | supportLanguages | string[] | Array of supported language codes (required) |
 
