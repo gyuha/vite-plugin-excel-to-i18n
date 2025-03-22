@@ -1,19 +1,15 @@
 import fs from 'fs';
 import path from 'path';
-import { createLogger } from 'vite';
 import { parse } from 'csv-parse/sync';
-import { set } from 'lodash-es';
 import { ExcelToI18nOptions } from '.';
-
-const logger = createLogger('info', { prefix: '[csv-to-i18n]' });
-const _dirname = path.resolve();
-
-const writeFile = (langPath: string, data: { [key: string]: object }) => {
-  Object.entries(data).forEach(([lang, localize]) => {
-    const filePath = path.join(_dirname, langPath, `translation.${lang}.json`);
-    fs.writeFileSync(filePath, JSON.stringify(localize, null, 2));
-  });
-};
+import {
+  _dirname,
+  writeFile,
+  initializeLocalize,
+  processRow,
+  ensureOutputDir,
+  logger
+} from './utils/i18n-utils';
 
 /**
  * 카테고리 경로를 배열로 변환
@@ -38,33 +34,14 @@ export default function csvToI18nJson(config: ExcelToI18nOptions) {
       trim: true
     });
 
-    const localize: any = {};
-    config.supportLanguages.forEach((lang) => {
-      localize[lang] = {};
-    });
+    const localize = initializeLocalize(config.supportLanguages);
 
     // CSV 데이터 처리
     records.forEach((row: any) => {
-      // category가 undefined인 경우 빈 배열 반환
-      const categoryPath = getCategoryPath(row['category']);
-      // key가 없으면 처리하지 않음
-      if (!row['key']) {
-        return;
-      }
-
-      const key = categoryPath.concat(row['key']);
-
-      config.supportLanguages.forEach((lang) => {
-        set(localize[lang], key, row[lang] || '');
-      });
+      processRow(row, localize, config.supportLanguages);
     });
 
-    // 출력 디렉토리가 없으면 생성
-    const outputDir = path.join(_dirname, config.outputDir);
-    if (!fs.existsSync(outputDir)) {
-      fs.mkdirSync(outputDir, { recursive: true });
-    }
-
+    ensureOutputDir(config.outputDir);
     writeFile(config.outputDir, localize);
     logger.info(`${config.excelPath} 파일이 성공적으로 변환되었습니다.`, { timestamp: true });
   } catch (error) {
