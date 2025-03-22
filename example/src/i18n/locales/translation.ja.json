@@ -1,7 +1,13 @@
 {
-  "reset": "初期化",
-  "next": "次へ",
-  "pre": "前のページ",
+  "common": {
+    "button": {
+      "reset": "初期化",
+      "next": "次へ",
+      "pre": "前のページ"
+    }
+  },
   "title": "i18n 多言語例",
-  "greeting": "こんにちは"
+  "message": {
+    "greeting": "こんにちは"
+  }
 }

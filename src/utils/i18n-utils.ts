@@ -12,7 +12,7 @@ export const _dirname = path.resolve();
  * @param category 카테고리 문자열 (예: 'common/button' 또는 'common.button')
  * @returns 카테고리 경로 배열
  */
-export const getCategoryPath = (category: string): string[] => {
+export const getCategoryPath = (category: string | undefined): string[] => {
   if (!category) return [];
   // '/' 또는 '.'로 분리하여 배열로 변환
   return category.split(/[/.]/);
@@ -42,6 +42,16 @@ export const initializeLocalize = (supportLanguages: string[]): { [key: string]:
   });
   return localize;
 };
+
+/**
+ * BOM과 따옴표를 제거하는 함수
+ * @param str 입력 문자열
+ * @returns 정리된 문자열
+ */
+export const cleanString = (str: string): string => {
+  return str.replace(/^\ufeff|['"`]/g, '');
+};
+
 
 /**
  * 행 데이터를 지역화 객체에 추가
