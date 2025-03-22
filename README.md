@@ -6,7 +6,7 @@ A Vite plugin that converts Excel files to i18n JSON files. Makes translation ma
 
 - 🚀 Converts Excel files to i18n JSON files
 - 📱 Real-time updates when Excel files change
-- 🔄 Supports nested key structures
+- 🔄 Supports nested key structures (using '/' or '.' as separators)
 - 🌐 Supports multiple languages
 
 ## Installation
@@ -28,9 +28,11 @@ The Excel file should be in the following format:
 | category | key | ko | en | ja | ... |
 |----------|-----|----|----|----|----|
 | common/button | reset | 초기화 | Reset | リセット | ... |
-| common/button | next | 다음 | Next | 次へ | ... |
+| common.button | next | 다음 | Next | 次へ | ... |
 | common/button | pre | 이전 | Previous | 前へ | ... |
-| common/button | button | 버튼 | Button | ボタン | ... |
+| common.button | button | 버튼 | Button | ボタン | ... |
+
+Note: You can use either '/' or '.' as category separators (e.g., 'common/button' or 'common.button').
 
 ### vite.config.ts Configuration
 
@@ -41,9 +43,9 @@ import excelToI18n from 'vite-plugin-excel-to-i18n';
 export default defineConfig({
   plugins: [
     excelToI18n({
-      excelPath: 'path/to/translations.xlsx', // Path to Excel file
-      outputDir: 'src/locales', // Output directory
-      supportLanguages: ['ko', 'en', 'ja'] // Supported languages
+      excelPath: 'src/i18n/language.csv',  // .csv 파일도 지원
+      outputDir: 'src/i18n/locales',
+      supportLanguages: ['ko', 'en', 'ja']
     })
   ]
 });

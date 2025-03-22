@@ -1,0 +1,6 @@
+﻿category,key,ko,ja,en,,,,,,,,,,,,,,,,,,,,,
+common/button,reset,초기화,初期化,Reset,,,,,,,,,,,,,,,,,,,,,
+common/button,next,다음,次へ,Next,,,,,,,,,,,,,,,,,,,,,
+common/button,pre,이전,前のページ,Previous,,,,,,,,,,,,,,,,,,,,,
+,title,i18n 다국어 예제,i18n 多言語例,i18n Multilingual Examples,,,,,,,,,,,,,,,,,,,,,
+message,greeting,안녕하세요,こんにちは,hello,,,,,,,,,,,,,,,,,,,,,

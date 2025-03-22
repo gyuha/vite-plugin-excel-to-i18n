@@ -29,6 +29,17 @@ const writeFile = (langPath: string, data: { [key: string]: object }) => {
     });
 };
 
+/**
+ * 카테고리 경로를 배열로 변환
+ * @param category 카테고리 문자열 (예: 'common/button' 또는 'common.button')
+ * @returns 카테고리 경로 배열
+ */
+const getCategoryPath = (category: string): string[] => {
+    if (!category) return [];
+    // '/' 또는 '.'로 분리하여 배열로 변환
+    return category.split(/[/.]/);
+};
+
 export default function excelToI18nJson(config: ExcelToI18nOptions) {
     config.supportLanguages.forEach((lang) => {
         if (schema[lang] === undefined) {
@@ -48,14 +59,14 @@ export default function excelToI18nJson(config: ExcelToI18nOptions) {
         }
         try {
             rows.forEach((row: any) => {
-                // category가 undefined인 경우 빈 문자열로 처리
-                const categoryPath = row['category'] ? row['category'].split('/') : [];
+                // category가 undefined인 경우 빈 배열 반환
+                const categoryPath = getCategoryPath(row['category']);
                 // key가 없으면 처리하지 않음
                 if (!row['key']) {
                     return;
                 }
                 
-                const key = [...categoryPath, row['key']];
+                const key = categoryPath.concat(row['key']);
 
                 config.supportLanguages.forEach((lang) => {
                     set(localize[lang], key, row[lang] || '');
